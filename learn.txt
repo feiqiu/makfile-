@@ -1,0 +1,88 @@
+SOURCE := $(wildcard *.c)
+
+OBJECTS := $(patsubst %.c, %.o, $(SOURCE))
+
+CC = gcc
+
+main:$(OBJECTS)
+	@ $(CC) $^ -o $@
+	
+%.o:%c
+	@ $(CC) $^ -c $@
+	
+.PHONY : clean
+clean:
+	@ rm $(OBJECTS) main
+
+
+1、wildcard : 扩展通配符
+2、notdir ： 去除路径
+3、patsubst ：替换通配符
+
+src=$(wildcard *.c ./sub/*.c)
+dir=$(notdir $(src))
+obj=$(patsubst %.c,%.o,$(dir) )
+
+
+CC=gcc
+CFLAGS=-I ../include/libexif -I ../include/
+LDFLAGS=-L ../lib/ -lexif
+
+src=$(wildcard *.c)
+
+objs=$(patsubst %.c, %.o, $(src))
+
+.PHONY:exe clean
+
+exe:$(objs)
+	$(CC) -o $@ $^
+	
+$(objs):%.o: %.c
+	$(CC) -c $(CFLAGS) $< -o $@
+	
+clean:
+	rm exe *.o
+
+赋值方式
+
+1、= 递归展开赋值
+SUBARCH=arm
+ARCH = $(SUBARCH)
+all:
+        @echo $(ARCH)
+输出:
+arm
+而
+ARCH = $(SUBARCH)
+SUBARCH=arm
+all:
+        @echo $(ARCH)
+也输出：
+arm
+
+2、?=: 如果没有初始化该变量，就给它赋上默认值。如：
+ARCH=arm
+ARCH ?= i386
+all:
+        @echo $(ARCH)
+输出:
+arm
+而
+ARCH ?= i386
+all:
+        @echo $(ARCH)
+输出:
+i386
+3、:= 直接赋值，不会递归展开，若引用的变量不存在，就展开为空串。如：
+SUBARCH=arm
+ARCH = $(SUBARCH)
+all:
+        @echo $(ARCH)
+输出:
+arm
+而
+ARCH = $(SUBARCH)
+SUBARCH=arm
+all:
+        @echo $(ARCH)
+输出：
